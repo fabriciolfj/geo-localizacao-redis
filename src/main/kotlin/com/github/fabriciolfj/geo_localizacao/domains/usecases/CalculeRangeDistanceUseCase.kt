@@ -30,8 +30,9 @@ class CalculeRangeDistanceUseCase(private val getLocationsGateway: GetLocationsG
 
     private fun calculeDistance(geolocation: Geolocation, locations: RGeo<String>) : Double {
         validations.forEach { it.execute(geolocation, locations) }
-
-        return addTargetLocationAndCalculateDistance(geolocation, locations)
+            .also {
+                return addTargetLocationAndCalculateDistance(geolocation, locations)
+            }
     }
 
     private fun addTargetLocationAndCalculateDistance(geolocation: Geolocation, locations: RGeo<String>): Double {
