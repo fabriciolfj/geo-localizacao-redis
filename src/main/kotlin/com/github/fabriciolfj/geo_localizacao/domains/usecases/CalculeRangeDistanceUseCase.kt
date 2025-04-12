@@ -51,7 +51,9 @@ class CalculeRangeDistanceUseCase(private val getLocationsGateway: GetLocationsG
     }
 
     private fun addTargetLocations(geolocation: Geolocation, location: RGeo<String>): GeoPosition {
-        val hash = hashGeoLocation(geolocation.getTargetLatitude(), geolocation.getTargetLongitude())
+        val hash = hashGeoLocation(geolocation.getTargetLatitude(),
+            geolocation.getTargetLongitude())
+
         location.add(geolocation.getTargetLongitude(),
             geolocation.getTargetLatitude(),
             BUCKET_TEMP_TARGET)
