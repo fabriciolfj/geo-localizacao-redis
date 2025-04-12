@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import java.time.LocalDateTime
 
 @ControllerAdvice
-class ControllerAdiveRest {
+class GlobalControllerAdviceRest {
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
