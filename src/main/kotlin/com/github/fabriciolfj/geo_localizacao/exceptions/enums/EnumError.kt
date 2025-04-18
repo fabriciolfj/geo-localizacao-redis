@@ -11,7 +11,7 @@ enum class EnumError {
     ERROR_GENERIC;
 
     fun toMessage() : String {
-        val bundle = ResourceBundle.getBundle("exceptions")
+        val bundle = ResourceBundle.getBundle("exceptions/messages")
         return bundle.getString("${this.name}.message")
     }
 }

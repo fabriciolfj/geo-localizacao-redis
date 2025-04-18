@@ -1,7 +1,9 @@
 package com.github.fabriciolfj.geo_localizacao.exceptions.handler
 
+import com.github.fabriciolfj.geo_localizacao.exceptions.dto.ErrorDTO
 import com.github.fabriciolfj.geo_localizacao.exceptions.dto.ValidationErrorResponse
 import com.github.fabriciolfj.geo_localizacao.exceptions.enums.EnumError
+import com.github.fabriciolfj.geo_localizacao.exceptions.exception.GetDistanceException
 import jakarta.validation.ConstraintViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -34,6 +36,14 @@ class GlobalControllerAdviceRest {
         )
 
         return ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST)
+    }
+
+    @ExceptionHandler(GetDistanceException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handleGetDistanceException(ex: GetDistanceException) : ResponseEntity<ErrorDTO> {
+        val dto = ErrorDTO(ex.message ?: "", HttpStatus.BAD_REQUEST.value())
+
+        return ResponseEntity.badRequest().body(dto)
     }
 
 

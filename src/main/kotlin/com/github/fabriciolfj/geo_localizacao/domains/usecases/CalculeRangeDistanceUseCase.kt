@@ -19,16 +19,16 @@ class CalculeRangeDistanceUseCase(private val getLocationsGateway: GetLocationsG
 
     fun execute(geolocation: Geolocation) =
         runCatching {
-            calculeDistance(geolocation, getLocationsGateway.process())
-        }.onSuccess {
-            log.info { "calculeted success $it" }
-            it
-        }.onFailure {
-            log.error { "fail process calcule distance ${it.message}" }
+            val value = calculateDistance(geolocation, getLocationsGateway.process())
+            log.error { "distance calculated $value" }
+
+            value
+        }.getOrElse {
+            log.error { "fail process calcule distance ${it.message} || detalhes ${it.printStackTrace()}" }
             throw GetDistanceException()
         }
 
-    private fun calculeDistance(geolocation: Geolocation, locations: RGeo<String>) : Double {
+    private fun calculateDistance(geolocation: Geolocation, locations: RGeo<String>) : Double {
         validations.forEach { it.execute(geolocation, locations) }
             .also {
                 return addTargetLocationAndCalculateDistance(geolocation, locations)
