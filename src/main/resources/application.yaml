@@ -5,7 +5,21 @@ spring:
     redis:
       url: redis://localhost:6379
 
-
-
 server:
-  port: 9090
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info"
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
