@@ -41,7 +41,7 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: fabricio211
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          password: ${{ docker.DOCKER_PASSWORD }}
 
       - name: Push Docker image
         run: |
