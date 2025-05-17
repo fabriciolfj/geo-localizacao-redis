@@ -3,7 +3,7 @@ spring:
     name: geo-localizacao
   data:
     redis:
-      url: redis://localhost:6379
+      url: redis://${REDIS_HOST:localhost}:6369
 
 server:
   port: 8080

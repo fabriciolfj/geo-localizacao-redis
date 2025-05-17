@@ -43,8 +43,8 @@ spec:
             periodSeconds: 30
             timeoutSeconds: 5
           env:
-            - name: SPRING_PROFILES_ACTIVE
-              value: "prod"
+            - name: REDIS_HOST
+              value: my-redis-master
             - name: JAVA_OPTS
               value: "-Xms256m -Xmx512m"
 ---
