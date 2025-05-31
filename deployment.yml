@@ -2,6 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: geo-location
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
+    prometheus.io/path: "/actuator/prometheus"
   labels:
     app: geo-location
 spec:
@@ -23,10 +27,10 @@ spec:
               name: http
           resources:
             requests:
-              cpu: 1000m
+              cpu: 900m
               memory: 1Gi
             limits:
-              cpu: 1000m
+              cpu: 900m
               memory: 1Gi
           readinessProbe:
             httpGet:
