@@ -11,6 +11,7 @@ import org.redisson.api.GeoUnit
 import org.redisson.api.RGeo
 import org.springframework.stereotype.Service
 import java.lang.RuntimeException
+import java.util.UUID
 import kotlin.random.Random
 
 @Service
@@ -38,7 +39,7 @@ class CalculeRangeDistanceUseCase(private val getLocationsGateway: GetLocationsG
     }
 
     private fun addTargetLocationAndCalculateDistance(geolocation: Geolocation, locations: RGeo<String>): Double {
-        val bucketTarget = BUCKET_TEMP_TARGET + System.currentTimeMillis() + Random(1000).nextInt()
+        val bucketTarget = BUCKET_TEMP_TARGET + UUID.randomUUID().toString()
         try {
 
             addTargetLocations(geolocation, locations, bucketTarget)
