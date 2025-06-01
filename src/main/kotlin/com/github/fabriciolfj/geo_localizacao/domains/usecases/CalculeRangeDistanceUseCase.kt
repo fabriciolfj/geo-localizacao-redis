@@ -65,7 +65,7 @@ class CalculeRangeDistanceUseCase(private val getLocationsGateway: GetLocationsG
 
 
             val distance = locations.dist(
-                tempSourceBucket ?: sourceHash,
+                sourceHash,
                 bucketTarget,
                 GeoUnit.KILOMETERS
             ) ?: throw RuntimeException("Failed to calculate distance - dist() returned null")
