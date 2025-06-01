@@ -10,6 +10,7 @@ import org.redisson.api.GeoPosition
 import org.redisson.api.GeoUnit
 import org.redisson.api.RGeo
 import org.springframework.stereotype.Service
+import kotlin.random.Random
 
 @Service
 class CalculeRangeDistanceUseCase(private val getLocationsGateway: GetLocationsGateway,
@@ -36,23 +37,25 @@ class CalculeRangeDistanceUseCase(private val getLocationsGateway: GetLocationsG
     }
 
     private fun addTargetLocationAndCalculateDistance(geolocation: Geolocation, locations: RGeo<String>): Double {
+        val bucketTarget = BUCKET_TEMP_TARGET + System.currentTimeMillis()
         try {
-            addTargetLocations(geolocation, locations)
+
+            addTargetLocations(geolocation, locations, bucketTarget)
 
             val sourceHash = hashGeoLocation(
                 geolocation.getSourceLatitude(),
                 geolocation.getSourceLongitude()
             )
 
-            return locations.dist(sourceHash, BUCKET_TEMP_TARGET, GeoUnit.KILOMETERS)
+            return locations.dist(sourceHash, bucketTarget, GeoUnit.KILOMETERS)
         } finally {
-            locations.remove(BUCKET_TEMP_TARGET)
+            locations.remove(bucketTarget)
         }
     }
 
-    private fun addTargetLocations(geolocation: Geolocation, location: RGeo<String>) {
+    private fun addTargetLocations(geolocation: Geolocation, location: RGeo<String>, bucket: String) {
         location.add(geolocation.getTargetLongitude(),
             geolocation.getTargetLatitude(),
-            BUCKET_TEMP_TARGET)
+            bucket)
     }
 }
