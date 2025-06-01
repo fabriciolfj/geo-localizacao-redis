@@ -10,6 +10,7 @@ import org.redisson.api.GeoPosition
 import org.redisson.api.GeoUnit
 import org.redisson.api.RGeo
 import org.springframework.stereotype.Service
+import java.lang.RuntimeException
 import kotlin.random.Random
 
 @Service
@@ -48,6 +49,9 @@ class CalculeRangeDistanceUseCase(private val getLocationsGateway: GetLocationsG
             )
 
             return locations.dist(sourceHash, bucketTarget, GeoUnit.KILOMETERS)
+        } catch (e: Exception){
+            log.error { "fail add target, case ${e.printStackTrace()}" }
+            throw RuntimeException(e.message)
         } finally {
             locations.remove(bucketTarget)
         }
