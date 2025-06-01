@@ -24,11 +24,11 @@ class CalculeRangeDistanceUseCase(private val getLocationsGateway: GetLocationsG
     fun execute(geolocation: Geolocation) =
         runCatching {
             val value = calculateDistance(geolocation, getLocationsGateway.process())
-            log.error("distance calculated {}", value)
+            log.info("distance calculated {}", value)
 
             value
         }.getOrElse {
-            log.error("fail process calcule distance {} || detalhes {}", it.message, it.printStackTrace())
+            log.warn("fail process calcule distance {} || detalhes {}", it.message, it.printStackTrace())
             throw GetDistanceException()
         }
 
