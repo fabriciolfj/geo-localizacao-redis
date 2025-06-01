@@ -37,7 +37,7 @@ class CalculeRangeDistanceUseCase(private val getLocationsGateway: GetLocationsG
     }
 
     private fun addTargetLocationAndCalculateDistance(geolocation: Geolocation, locations: RGeo<String>): Double {
-        val bucketTarget = BUCKET_TEMP_TARGET + System.currentTimeMillis()
+        val bucketTarget = BUCKET_TEMP_TARGET + System.currentTimeMillis() + Random(1000).nextInt()
         try {
 
             addTargetLocations(geolocation, locations, bucketTarget)
