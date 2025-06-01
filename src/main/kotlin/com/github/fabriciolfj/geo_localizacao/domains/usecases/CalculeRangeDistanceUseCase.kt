@@ -15,10 +15,8 @@ import java.util.UUID
 import kotlin.random.Random
 
 @Service
-class CalculeRangeDistanceUseCase(
-    private val getLocationsGateway: GetLocationsGateway,
-    private val validations: List<ValidationsExistsLocationsUseCase>
-) {
+class CalculeRangeDistanceUseCase(private val getLocationsGateway: GetLocationsGateway,
+                                  private val validations: List<ValidationsExistsLocationsUseCase>) {
 
     private val log = KotlinLogging.logger {}
 
@@ -33,7 +31,7 @@ class CalculeRangeDistanceUseCase(
             throw GetDistanceException()
         }
 
-    private fun calculateDistance(geolocation: Geolocation, locations: RGeo<String>): Double {
+    private fun calculateDistance(geolocation: Geolocation, locations: RGeo<String>) : Double {
         validations.forEach { it.execute(geolocation, locations) }
             .also {
                 return addTargetLocationAndCalculateDistance(geolocation, locations)
@@ -43,16 +41,38 @@ class CalculeRangeDistanceUseCase(
     private fun addTargetLocationAndCalculateDistance(geolocation: Geolocation, locations: RGeo<String>): Double {
         val bucketTarget = BUCKET_TEMP_TARGET + UUID.randomUUID().toString()
         try {
-
-            addTargetLocations(geolocation, locations, bucketTarget)
+            val targetAdded = addTargetLocations(geolocation, locations, bucketTarget)
+            if (!targetAdded) {
+                throw RuntimeException("Failed to add target location to Redis")
+            }
 
             val sourceHash = hashGeoLocation(
                 geolocation.getSourceLatitude(),
                 geolocation.getSourceLongitude()
             )
 
-            return locations.dist(sourceHash, bucketTarget, GeoUnit.KILOMETERS)
-        } catch (e: Exception) {
+            val sourceExists = locations.pos(sourceHash).isNotEmpty()
+            val tempSourceBucket = if (!sourceExists) {
+                val tempBucket = "temp_source_${UUID.randomUUID()}"
+                locations.add(
+                    geolocation.getSourceLongitude(),
+                    geolocation.getSourceLatitude(),
+                    tempBucket
+                )
+                tempBucket
+            } else null
+
+
+            val distance = locations.dist(
+                tempSourceBucket ?: sourceHash,
+                bucketTarget,
+                GeoUnit.KILOMETERS
+            ) ?: throw RuntimeException("Failed to calculate distance - dist() returned null")
+
+            tempSourceBucket?.let { locations.remove(it) }
+
+            return distance
+        } catch (e: Exception){
             log.error { "fail add target, case ${e.printStackTrace()}" }
             throw RuntimeException(e.message)
         } finally {
@@ -64,8 +84,8 @@ class CalculeRangeDistanceUseCase(
         }
     }
 
-    private fun addTargetLocations(geolocation: Geolocation, location: RGeo<String>, bucket: String) {
-        try {
+    private fun addTargetLocations(geolocation: Geolocation, location: RGeo<String>, bucket: String): Boolean {
+        return try {
             location.add(
                 geolocation.getTargetLongitude(),
                 geolocation.getTargetLatitude(),
@@ -79,8 +99,10 @@ class CalculeRangeDistanceUseCase(
                 log.error { "Target location was not added successfully to bucket: $bucket" }
             }
 
+            added
         } catch (e: Exception) {
             log.error(e) { "Exception while adding target location to bucket: $bucket" }
+            false
         }
     }
 }
