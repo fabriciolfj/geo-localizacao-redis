@@ -63,11 +63,7 @@ class CalculeRangeDistanceUseCase(private val getLocationsGateway: GetLocationsG
             log.error ("failed add target, case {}", e.printStackTrace())
             throw RuntimeException(e.message)
         } finally {
-            try {
-                locations.remove(bucketTarget)
-            } catch (cleanupException: Exception) {
-                log.warn("failed to cleanup bucket: {}", bucketTarget)
-            }
+            locations.remove(bucketTarget)
         }
     }
 
