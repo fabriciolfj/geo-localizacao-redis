@@ -52,35 +52,21 @@ class CalculeRangeDistanceUseCase(private val getLocationsGateway: GetLocationsG
                 geolocation.getSourceLongitude()
             )
 
-            val sourceExists = locations.pos(sourceHash).isNotEmpty()
-            val tempSourceBucket = if (!sourceExists) {
-                val tempBucket = "temp_source_${UUID.randomUUID()}"
-                locations.add(
-                    geolocation.getSourceLongitude(),
-                    geolocation.getSourceLatitude(),
-                    tempBucket
-                )
-                tempBucket
-            } else null
-
-
             val distance = locations.dist(
                 sourceHash,
                 bucketTarget,
                 GeoUnit.KILOMETERS
-            ) ?: throw RuntimeException("Failed to calculate distance - dist() returned null")
-
-            tempSourceBucket?.let { locations.remove(it) }
+            ) ?: throw RuntimeException("failed to calculate distance - dist() returned null")
 
             return distance
         } catch (e: Exception){
-            log.error ("fail add target, case {}", e.printStackTrace())
+            log.error ("failed add target, case {}", e.printStackTrace())
             throw RuntimeException(e.message)
         } finally {
             try {
                 locations.remove(bucketTarget)
             } catch (cleanupException: Exception) {
-                log.warn("Failed to cleanup bucket: {}", bucketTarget)
+                log.warn("failed to cleanup bucket: {}", bucketTarget)
             }
         }
     }
@@ -97,12 +83,12 @@ class CalculeRangeDistanceUseCase(private val getLocationsGateway: GetLocationsG
             val added = positions.isNotEmpty()
 
             if (!added) {
-                log.error ("Target location was not added successfully to bucket: {}", bucket)
+                log.error ("target location was not added successfully to bucket: {}", bucket)
             }
 
             added
         } catch (e: Exception) {
-            log.error("Exception while adding target location to bucket: {}", bucket)
+            log.error("exception while adding target location to bucket: {}", bucket)
             false
         }
     }

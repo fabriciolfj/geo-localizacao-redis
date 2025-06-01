@@ -5,7 +5,7 @@ metadata:
   labels:
     app: geo-location
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: geo-location
