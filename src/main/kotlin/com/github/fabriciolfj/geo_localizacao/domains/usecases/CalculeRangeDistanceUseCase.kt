@@ -9,6 +9,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.redisson.api.GeoPosition
 import org.redisson.api.GeoUnit
 import org.redisson.api.RGeo
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.lang.RuntimeException
 import java.util.UUID
@@ -18,16 +19,16 @@ import kotlin.random.Random
 class CalculeRangeDistanceUseCase(private val getLocationsGateway: GetLocationsGateway,
                                   private val validations: List<ValidationsExistsLocationsUseCase>) {
 
-    private val log = KotlinLogging.logger {}
+    private val log = LoggerFactory.getLogger(CalculeRangeDistanceUseCase::class.java)
 
     fun execute(geolocation: Geolocation) =
         runCatching {
             val value = calculateDistance(geolocation, getLocationsGateway.process())
-            log.error { "distance calculated $value" }
+            log.error("distance calculated {}", value)
 
             value
         }.getOrElse {
-            log.error { "fail process calcule distance ${it.message} || detalhes ${it.printStackTrace()}" }
+            log.error("fail process calcule distance {} || detalhes {}", it.message, it.printStackTrace())
             throw GetDistanceException()
         }
 
@@ -73,13 +74,13 @@ class CalculeRangeDistanceUseCase(private val getLocationsGateway: GetLocationsG
 
             return distance
         } catch (e: Exception){
-            log.error { "fail add target, case ${e.printStackTrace()}" }
+            log.error ("fail add target, case {}", e.printStackTrace())
             throw RuntimeException(e.message)
         } finally {
             try {
                 locations.remove(bucketTarget)
             } catch (cleanupException: Exception) {
-                log.warn(cleanupException) { "Failed to cleanup bucket: $bucketTarget" }
+                log.warn("Failed to cleanup bucket: {}", bucketTarget)
             }
         }
     }
@@ -96,12 +97,12 @@ class CalculeRangeDistanceUseCase(private val getLocationsGateway: GetLocationsG
             val added = positions.isNotEmpty()
 
             if (!added) {
-                log.error { "Target location was not added successfully to bucket: $bucket" }
+                log.error ("Target location was not added successfully to bucket: {}", bucket)
             }
 
             added
         } catch (e: Exception) {
-            log.error(e) { "Exception while adding target location to bucket: $bucket" }
+            log.error("Exception while adding target location to bucket: {}", bucket)
             false
         }
     }
