@@ -15,8 +15,10 @@ import java.util.UUID
 import kotlin.random.Random
 
 @Service
-class CalculeRangeDistanceUseCase(private val getLocationsGateway: GetLocationsGateway,
-                                  private val validations: List<ValidationsExistsLocationsUseCase>) {
+class CalculeRangeDistanceUseCase(
+    private val getLocationsGateway: GetLocationsGateway,
+    private val validations: List<ValidationsExistsLocationsUseCase>
+) {
 
     private val log = KotlinLogging.logger {}
 
@@ -31,7 +33,7 @@ class CalculeRangeDistanceUseCase(private val getLocationsGateway: GetLocationsG
             throw GetDistanceException()
         }
 
-    private fun calculateDistance(geolocation: Geolocation, locations: RGeo<String>) : Double {
+    private fun calculateDistance(geolocation: Geolocation, locations: RGeo<String>): Double {
         validations.forEach { it.execute(geolocation, locations) }
             .also {
                 return addTargetLocationAndCalculateDistance(geolocation, locations)
@@ -50,17 +52,35 @@ class CalculeRangeDistanceUseCase(private val getLocationsGateway: GetLocationsG
             )
 
             return locations.dist(sourceHash, bucketTarget, GeoUnit.KILOMETERS)
-        } catch (e: Exception){
+        } catch (e: Exception) {
             log.error { "fail add target, case ${e.printStackTrace()}" }
             throw RuntimeException(e.message)
         } finally {
-            locations.remove(bucketTarget)
+            try {
+                locations.remove(bucketTarget)
+            } catch (cleanupException: Exception) {
+                log.warn(cleanupException) { "Failed to cleanup bucket: $bucketTarget" }
+            }
         }
     }
 
     private fun addTargetLocations(geolocation: Geolocation, location: RGeo<String>, bucket: String) {
-        location.add(geolocation.getTargetLongitude(),
-            geolocation.getTargetLatitude(),
-            bucket)
+        try {
+            location.add(
+                geolocation.getTargetLongitude(),
+                geolocation.getTargetLatitude(),
+                bucket
+            )
+
+            val positions = location.pos(bucket)
+            val added = positions.isNotEmpty()
+
+            if (!added) {
+                log.error { "Target location was not added successfully to bucket: $bucket" }
+            }
+
+        } catch (e: Exception) {
+            log.error(e) { "Exception while adding target location to bucket: $bucket" }
+        }
     }
 }
