@@ -51,7 +51,7 @@ class GetLocationsAdapter(private val redissonClient: RedissonClient) : GetLocat
                 continue
             }
 
-            val parts = line!!.split(";".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            val parts = line.split(";".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             if (parts.size >= 2) {
                 val longitude = parts[0].trim { it <= ' ' }.toDouble()
                 val latitude = parts[1].trim { it <= ' ' }.toDouble()

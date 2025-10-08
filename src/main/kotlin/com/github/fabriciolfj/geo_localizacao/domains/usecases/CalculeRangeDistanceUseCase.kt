@@ -1,19 +1,14 @@
 package com.github.fabriciolfj.geo_localizacao.domains.usecases
 
 import com.github.fabriciolfj.geo_localizacao.domains.entities.Geolocation
-import com.github.fabriciolfj.geo_localizacao.exceptions.exception.GeoLocationNotExistsException
 import com.github.fabriciolfj.geo_localizacao.exceptions.exception.GetDistanceException
 import com.github.fabriciolfj.geo_localizacao.uil.ConstantsDomain.BUCKET_TEMP_TARGET
 import com.github.fabriciolfj.geo_localizacao.uil.HashGeoLocationUtil.hashGeoLocation
-import io.github.oshai.kotlinlogging.KotlinLogging
-import org.redisson.api.GeoPosition
 import org.redisson.api.GeoUnit
 import org.redisson.api.RGeo
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.lang.RuntimeException
-import java.util.UUID
-import kotlin.random.Random
+import java.util.*
 
 @Service
 class CalculeRangeDistanceUseCase(private val getLocationsGateway: GetLocationsGateway,

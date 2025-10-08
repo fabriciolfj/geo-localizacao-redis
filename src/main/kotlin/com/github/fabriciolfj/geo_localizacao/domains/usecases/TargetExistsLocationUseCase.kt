@@ -17,7 +17,7 @@ class TargetExistsLocationUseCase : ValidationsExistsLocationsUseCase {
         val hash = hashGeoLocation(geolocation.getTargetLatitude(), geolocation.getTargetLongitude())
         val position = locations.pos(hash)
 
-        if (position == null || position.isEmpty() || position[hash] == null) {
+        if (position.isNullOrEmpty() || position[hash] == null) {
             log.info { "target location not found $hash" }
 
             throw TargetNotExistsException()

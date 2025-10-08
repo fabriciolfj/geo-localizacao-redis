@@ -16,7 +16,7 @@ class SourceExistsLocationUseCase : ValidationsExistsLocationsUseCase {
         val hash = hashGeoLocation(geolocation.getSourceLatitude(), geolocation.getSourceLongitude())
         val position = locations.pos(hash)
 
-        if (position == null || position.isEmpty() || position[hash] == null) {
+        if (position.isNullOrEmpty() || position[hash] == null) {
             log.info { "source location not found $hash" }
 
             throw SourceNotExistsException()
