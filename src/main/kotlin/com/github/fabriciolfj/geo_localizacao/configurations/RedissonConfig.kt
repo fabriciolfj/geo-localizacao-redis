@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 class RedissonConfig(
-    @Value("\${spring.data.redis.url}")
+    @param:Value("\${spring.data.redis.url}")
     private val host: String) {
 
     @Bean
